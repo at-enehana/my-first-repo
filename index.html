@@ -1,17 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
+    <title>Leaflet Map with Language Switcher</title>
+    <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Map</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 400px; }
+        .language-button {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: white;
+            padding: 10px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            z-index: 1000;
+        }
+    </style>
 </head>
 <body>
-    <h1>My Interactive Map</h1>
     <div id="map"></div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="script.js"></script>
+    <div class="language-button" onclick="switchLanguage()">
+        Switch to ʻŌlelo Hawaiʻi
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([20.5, -157.5], 7);
+
+        // Add a tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // School data
+        var schoolData = {
+            name_en: "Hawaii School",
+            name_haw: "Kula o Hawaiʻi",
+            lat: 20.8,
+            lon: -156.3,
+            website: "https://www.hawaiischool.edu",
+            image: "https://via.placeholder.com/100",
+            description_en: "Hawaii School is a leading educational institution in Hawaii, offering excellent academic programs and a vibrant campus life.",
+            description_haw: "ʻO Kula o Hawaiʻi kekahi o nā kula maikaʻi loa ma Hawaiʻi, e hāʻawi ana i nā papahana aʻo maikaʻi a me ke ola o ke kaiaulu."
+        };
+
+        // Create a marker
+        var marker = L.marker([schoolData.lat, schoolData.lon]).addTo(map);
+
+        // Function to get popup content in the selected language
+        function getPopupContent(language) {
+            return `
+                <b>${language === 'haw' ? schoolData.name_haw : schoolData.name_en}</b><br>
+                <img src="${schoolData.image}" alt="${schoolData.name_en}" style="width:100px;height:auto;"><br>
+                <a href="${schoolData.website}" target="_blank">Visit Website</a><br>
+                ${language === 'haw' ? schoolData.description_haw : schoolData.description_en}
+            `;
+        }
+
+        // Set default popup content in English
+        marker.bindPopup(getPopupContent('en'));
+
+        // Language switch function
+        var currentLanguage = 'en';
+        function switchLanguage() {
+            currentLanguage = currentLanguage === 'en' ? 'haw' : 'en';
+            marker.setPopupContent(getPopupContent(currentLanguage));
+            document.querySelector('.language-button').textContent = 
+                currentLanguage === 'en' ? 'Switch to ʻŌlelo Hawaiʻi' : 'Switch to English';
+        }
+    </script>
 </body>
 </html>
