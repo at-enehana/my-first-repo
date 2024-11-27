@@ -80,3 +80,16 @@ function switchLanguage() {
 
 // Initialize the map and add markers
 addSchoolMarkers();
+
+document.getElementById('reload-data').addEventListener('click', async () => {
+    console.log('Reloading data...');
+    // Clear existing markers
+    map.eachLayer(layer => {
+        if (layer instanceof L.Marker) {
+            map.removeLayer(layer);
+        }
+    });
+
+    // Fetch and add fresh data
+    await addSchoolMarkers();
+});
