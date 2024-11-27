@@ -23,7 +23,8 @@ async function fetchSchoolData() {
             website: cols[3].trim(),
             image: cols[4].trim(),
             description_en: cols[5].trim(),
-            description_haw: cols[6].trim()
+            description_haw: cols[6].trim(),
+            programs: cols[7].trim().split(',') // Split programs into an array
         }));
 }
 
@@ -41,10 +42,11 @@ async function addSchoolMarkers() {
         // Function to get popup content
         function getPopupContent(language) {
             return `
-                <b>${school.name}</b><br> <!-- Single name -->
+                <b>${school.name}</b><br>
                 <img src="${school.image}" alt="${school.name}" style="width:100px;height:auto;"><br>
                 <a href="${school.website}" target="_blank">Visit Website</a><br>
-                ${language === 'haw' ? school.description_haw : school.description_en}
+                ${language === 'haw' ? school.description_haw : school.description_en}<br>
+                <b>Programs:</b> ${school.programs.join(', ')}
             `;
         }        
 
