@@ -13,19 +13,18 @@ async function fetchSchoolData() {
     const csvText = await response.text();
 
     // Parse CSV into JSON
-    return csvText.split('\n').slice(1).map(row => {
-        const cols = row.split(',');
-        return {
-            name_en: cols[0].trim(),
-            name_haw: cols[1].trim(),
-            lat: parseFloat(cols[2]),
-            lon: parseFloat(cols[3]),
-            website: cols[4].trim(),
-            image: cols[5].trim(),
-            description_en: cols[6].trim(),
-            description_haw: cols[7].trim()
-        };
-    });
+    return csvText.split('\n').slice(1) // Skip header row
+        .map(row => row.split(',')) // Split each row into columns
+        .filter(cols => cols.length >= 7 && cols[0].trim() !== '') // Ensure valid rows
+        .map(cols => ({
+            name: cols[0].trim(), // Single name field
+            lat: parseFloat(cols[1]),
+            lon: parseFloat(cols[2]),
+            website: cols[3].trim(),
+            image: cols[4].trim(),
+            description_en: cols[5].trim(),
+            description_haw: cols[6].trim()
+        }));
 }
 
 // Language switch listeners
