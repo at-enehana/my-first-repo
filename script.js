@@ -1,8 +1,8 @@
-// Add a tile layer
+// Initialize the map
+const map = L.map('map').setView([20.5, -157.5], 7);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(map);
-
 
 // Replace this URL with your published Google Sheet CSV link
 const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHToNa8zSIoMdIkW1Ky9m-wHPYfUTcThP5BDn1fVDsvBy2_cnqTrsjg3wkxxLxlXS3aBwx3TWfUW9L/pub?output=csv';
@@ -28,6 +28,11 @@ async function fetchSchoolData() {
     });
 }
 
+// Language switch listeners
+const languageSwitchListeners = [];
+let currentLanguage = 'en';
+
+// Add markers to the map
 async function addSchoolMarkers() {
     const schools = await fetchSchoolData();
 
@@ -37,7 +42,7 @@ async function addSchoolMarkers() {
         // Function to get popup content
         function getPopupContent(language) {
             return `
-                <b>${language === 'haw' ? school.name_haw : school.name_en}</b><br>
+                <b>${school.name_en}</b><br>
                 <img src="${school.image}" alt="${school.name_en}" style="width:100px;height:auto;"><br>
                 <a href="${school.website}" target="_blank">Visit Website</a><br>
                 ${language === 'haw' ? school.description_haw : school.description_en}
@@ -47,56 +52,32 @@ async function addSchoolMarkers() {
         // Set default popup content
         marker.bindPopup(getPopupContent(currentLanguage));
 
-        // Update popup content on language switch
+        // Add a listener to update the popup content on language switch
         languageSwitchListeners.push(() => {
             marker.setPopupContent(getPopupContent(currentLanguage));
         });
     });
 }
 
-// Add a listener to update markers when the language changes
-const languageSwitchListeners = [];
-function switchLanguage() {
-    currentLanguage = currentLanguage === 'en' ? 'haw' : 'en';
-    languageSwitchListeners.forEach(listener => listener());
-}
-
-// Initialize the map and add markers
-const map = L.map('map').setView([20.5, -157.5], 7);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
-addSchoolMarkers();
-
-
-// Function to get popup content in the selected language
-function getPopupContent(language) {
-    return `
-        <b>${language === 'haw' ? schoolData.name_haw : schoolData.name_en}</b><br>
-        <img src="${schoolData.image}" alt="${schoolData.name_en}" style="width:100px;height:auto;"><br>
-        <a href="${schoolData.website}" target="_blank">Visit Website</a><br>
-        ${language === 'haw' ? schoolData.description_haw : schoolData.description_en}
-    `;
-}
-
-// Set default popup content in English
-marker.bindPopup(getPopupContent('en'));
-
 // Language switch function
-var currentLanguage = 'en';
 function switchLanguage() {
     currentLanguage = currentLanguage === 'en' ? 'haw' : 'en';
-    marker.setPopupContent(getPopupContent(currentLanguage));
-    
-    // Update the flag image
+
+    // Update all markers' popups
+    languageSwitchListeners.forEach(listener => listener());
+
+    // Update the flag image and button text
     const languageFlag = document.getElementById('language-flag');
     if (currentLanguage === 'en') {
         languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Hawaii.svg';
         languageFlag.alt = 'Hawaiian Flag';
-        languageFlag.nextSibling.textContent = ' Switch to ʻŌlelo Hawaiʻi'; // Update only the text
+        languageFlag.nextSibling.textContent = ' Switch to ʻŌlelo Hawaiʻi';
     } else {
         languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg';
         languageFlag.alt = 'American Flag';
-        languageFlag.nextSibling.textContent = ' Switch to English'; // Update only the text
+        languageFlag.nextSibling.textContent = ' Switch to English';
     }
 }
+
+// Initialize the map and add markers
+addSchoolMarkers();
