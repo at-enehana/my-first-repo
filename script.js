@@ -40,17 +40,15 @@ function switchLanguage() {
     currentLanguage = currentLanguage === 'en' ? 'haw' : 'en';
     marker.setPopupContent(getPopupContent(currentLanguage));
     
-    // Update the button text and flag
-    const languageButton = document.querySelector('.language-button');
+    // Update the flag image
     const languageFlag = document.getElementById('language-flag');
     if (currentLanguage === 'en') {
-        languageButton.textContent = ' Switch to ʻŌlelo Hawaiʻi';
-        languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Hawaii.svg';
-        languageFlag.alt = 'Hawaiian Flag';
-    } else {
-        languageButton.textContent = ' Switch to English';
         languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg';
         languageFlag.alt = 'American Flag';
-
+        languageFlag.nextSibling.textContent = ' Switch to ʻŌlelo Hawaiʻi'; // Update only the text
+    } else {
+        languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Hawaii.svg';
+        languageFlag.alt = 'Hawaiian Flag';
+        languageFlag.nextSibling.textContent = ' Switch to English'; // Update only the text
     }
 }
