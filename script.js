@@ -41,12 +41,12 @@ async function addSchoolMarkers() {
         // Function to get popup content
         function getPopupContent(language) {
             return `
-                <b>${school.name_en}</b><br>
-                <img src="${school.image}" alt="${school.name_en}" style="width:100px;height:auto;"><br>
+                <b>${school.name}</b><br> <!-- Single name -->
+                <img src="${school.image}" alt="${school.name}" style="width:100px;height:auto;"><br>
                 <a href="${school.website}" target="_blank">Visit Website</a><br>
                 ${language === 'haw' ? school.description_haw : school.description_en}
             `;
-        }
+        }        
 
         // Set default popup content
         marker.bindPopup(getPopupContent(currentLanguage));
