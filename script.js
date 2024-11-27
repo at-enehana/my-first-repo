@@ -45,11 +45,12 @@ function switchLanguage() {
     const languageFlag = document.getElementById('language-flag');
     if (currentLanguage === 'en') {
         languageButton.textContent = ' Switch to ʻŌlelo Hawaiʻi';
-        languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg';
-        languageFlag.alt = 'American Flag';
-    } else {
-        languageButton.textContent = ' Switch to English';
         languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Hawaii.svg';
         languageFlag.alt = 'Hawaiian Flag';
+    } else {
+        languageButton.textContent = ' Switch to English';
+        languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg';
+        languageFlag.alt = 'American Flag';
+
     }
 }
