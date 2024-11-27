@@ -60,41 +60,6 @@ async function addSchoolMarkers() {
     });
 }
 
-async function addSchoolMarkers() {
-    const schools = await fetchSchoolData();
-
-    // Clear existing markers
-    map.eachLayer(layer => {
-        if (layer instanceof L.Marker) {
-            map.removeLayer(layer);
-        }
-    });
-
-    // Get selected program from the dropdown
-    const selectedProgram = document.getElementById('program-filter').value;
-
-    schools.forEach(school => {
-        // Skip schools that don't have the selected program
-        if (selectedProgram !== 'all' && !school.programs.includes(selectedProgram)) {
-            return;
-        }
-
-        const marker = L.marker([school.lat, school.lon]).addTo(map);
-
-        // Set popup content
-        marker.bindPopup(getPopupContent(currentLanguage, school));
-
-        // Add to language switch listeners
-        languageSwitchListeners.push(() => {
-            marker.setPopupContent(getPopupContent(currentLanguage, school));
-        });
-    });
-}
-
-document.getElementById('program-filter').addEventListener('change', () => {
-    addSchoolMarkers();
-});
-
 // Language switch function
 function switchLanguage() {
     currentLanguage = currentLanguage === 'en' ? 'haw' : 'en';
@@ -130,5 +95,3 @@ document.getElementById('reload-data').addEventListener('click', async () => {
     // Fetch and add fresh data
     await addSchoolMarkers();
 });
-
-
