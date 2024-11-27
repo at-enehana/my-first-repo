@@ -1,6 +1,3 @@
-// Initialize the map
-var map = L.map('map').setView([20.5, -157.5], 7);
-
 // Add a tile layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -19,13 +16,14 @@ async function fetchSchoolData() {
     return csvText.split('\n').slice(1).map(row => {
         const cols = row.split(',');
         return {
-            name: cols[0].trim(),
-            lat: parseFloat(cols[1]),
-            lon: parseFloat(cols[2]),
-            website: cols[3].trim(),
-            image: cols[4].trim(),
-            description_en: cols[5].trim(),
-            description_haw: cols[6].trim()
+            name_en: cols[0].trim(),
+            name_haw: cols[1].trim(),
+            lat: parseFloat(cols[2]),
+            lon: parseFloat(cols[3]),
+            website: cols[4].trim(),
+            image: cols[5].trim(),
+            description_en: cols[6].trim(),
+            description_haw: cols[7].trim()
         };
     });
 }
@@ -39,8 +37,8 @@ async function addSchoolMarkers() {
         // Function to get popup content
         function getPopupContent(language) {
             return `
-                <b>${school.name}</b><br>
-                <img src="${school.image}" alt="${school.name}" style="width:100px;height:auto;"><br>
+                <b>${language === 'haw' ? school.name_haw : school.name_en}</b><br>
+                <img src="${school.image}" alt="${school.name_en}" style="width:100px;height:auto;"><br>
                 <a href="${school.website}" target="_blank">Visit Website</a><br>
                 ${language === 'haw' ? school.description_haw : school.description_en}
             `;
@@ -55,7 +53,6 @@ async function addSchoolMarkers() {
         });
     });
 }
-
 
 // Add a listener to update markers when the language changes
 const languageSwitchListeners = [];
