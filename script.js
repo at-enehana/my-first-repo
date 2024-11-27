@@ -8,4 +8,4 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Add a marker
 const marker = L.marker([20.7967, -156.3319]).addTo(map);
-marker.bindPopup('Aloha! Welcome to Maui.').openPopup();
+marker.bindPopup('Aloha! Testing out a map.').openPopup();
