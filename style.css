@@ -3,13 +3,28 @@ body {
     font-family: Arial, sans-serif;
 }
 
-h1 {
-    text-align: center;
-    margin-top: 20px;
-}
-
 #map {
     height: 80vh; /* Map takes up 80% of the viewport height */
     margin: 0 auto;
-    width: 90%; /* Map width is 90% of the viewport width */
+    width: 100%; /* Map width is 100% of the viewport width */
+}
+
+.language-button {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: white;
+    padding: 10px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.language-button img {
+    margin-right: 5px;
+    width: 20px;
+    height: 20px;
 }
