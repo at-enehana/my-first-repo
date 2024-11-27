@@ -44,3 +44,16 @@ body {
 .control-button:hover {
     background: #0056b3;
 }
+
+.control-button {
+    position: absolute;
+    top: 50px;
+    right: 10px;
+    z-index: 1000;
+    padding: 5px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
