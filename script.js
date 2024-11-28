@@ -5,121 +5,139 @@ document.addEventListener('DOMContentLoaded', () => {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // URL for Google Sheets CSV
-    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHToNa8zSIoMdIkW1Ky9m-wHPYfUTcThP5BDn1fVDsvBy2_cnqTrsjg3wkxxLxlXS3aBwx3TWfUW9L/pub?output=csv';
-
-    // Store markers globally for filtering
-    let schoolMarkers = [];
-
-    /**
-     * Fetch school data from Google Sheets.
-     * @returns {Promise<Array>} Parsed school data.
-     */
-    async function fetchSchoolData() {
-        try {
-            const response = await fetch(sheetURL);
-            const csvText = await response.text();
-
-            // Log the raw CSV data
-            console.log('CSV Data:', csvText);
-
-            // Parse CSV into JSON
-            return csvText
-                .split('\n')
-                .slice(1) // Skip header row
-                .map(row => row.split(','))
-                .filter(cols => cols.length >= 8 && cols[0].trim()) // Ensure valid rows
-                .map(([name, latitude, longitude, website, imageURL, descEn, descHaw, programs]) => ({
-                    name: name.trim(),
-                    lat: parseFloat(latitude),
-                    lon: parseFloat(longitude),
-                    website: website.trim(),
-                    image: imageURL.trim(),
-                    description_en: descEn.trim(),
-                    description_haw: descHaw.trim(),
-                    programs: programs.trim().split(',')
-                }));
-        } catch (error) {
-            console.error('Error fetching school data:', error);
-            return [];
-        }
+    const programFilter = document.getElementById('program-filter');
+    if (!programFilter) {
+        console.error('Dropdown element (#program-filter) not found.');
+        return; // Exit early if the element doesn't exist
     }
 
-    /**
-     * Generate popup content for a school marker.
-     */
-    function getPopupContent(school, language) {
-        return `
-            <b>${school.name}</b><br>
-            <img src="${school.image}" alt="${school.name}" style="width:100px;height:auto;"><br>
-            <a href="${school.website}" target="_blank">Visit Website</a><br>
-            ${language === 'haw' ? school.description_haw : school.description_en}<br>
-            <b>Programs:</b> ${school.programs.join(', ')}
-        `;
-    }
+    // Log dropdown initialization
+    console.log('Program Filter:', programFilter);
 
-    // Language switch
+    // Language switch listeners
     const languageSwitchListeners = [];
     let currentLanguage = 'en';
 
-    function switchLanguage() {
-        currentLanguage = currentLanguage === 'en' ? 'haw' : 'en';
-        languageSwitchListeners.forEach(listener => listener());
-        const languageFlag = document.getElementById('language-flag');
-        languageFlag.src = currentLanguage === 'en'
-            ? 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Hawaii.svg'
-            : 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg';
-        languageFlag.alt = currentLanguage === 'en' ? 'Hawaiian Flag' : 'American Flag';
-        languageFlag.nextSibling.textContent = currentLanguage === 'en'
-            ? ' Switch to ʻŌlelo Hawaiʻi'
-            : ' Switch to English';
+    // Replace this URL with your published Google Sheet CSV link
+    const sheetURL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQHToNa8zSIoMdIkW1Ky9m-wHPYfUTcThP5BDn1fVDsvBy2_cnqTrsjg3wkxxLxlXS3aBwx3TWfUW9L/pub?output=csv';
+
+    // Fetch and parse the Google Sheet data
+    async function fetchSchoolData() {
+        const response = await fetch(sheetURL);
+        const csvText = await response.text();
+
+        // Parse CSV into JSON
+        return csvText.split('\n').slice(1) // Skip header row
+            .map(row => row.split(',')) // Split each row into columns
+            .filter(cols => cols.length >= 7 && cols[0].trim() !== '') // Ensure valid rows
+            .map(cols => ({
+                name: cols[0].trim(),
+                lat: parseFloat(cols[1]),
+                lon: parseFloat(cols[2]),
+                website: cols[3].trim(),
+                image: cols[4].trim(),
+                description_en: cols[5].trim(),
+                description_haw: cols[6].trim(),
+                programs: cols[7].trim().split(',') // Split programs into an array
+            }));
     }
 
-    /**
-     * Add school markers to the map.
-     * @param {string} filter - Program filter (default: 'all').
-     */
-    async function addSchoolMarkers(filter = 'all') {
+    // Add school markers to the map
+    async function addSchoolMarkers() {
         const schools = await fetchSchoolData();
-        console.log('Fetched Schools:', schools);
 
-        // Remove existing markers
-        schoolMarkers.forEach(marker => map.removeLayer(marker));
-        schoolMarkers = [];
+        // Clear existing markers
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+            }
+        });
 
-        // Filter and add markers
-        schools
-            .filter(school => filter === 'all' || school.programs.includes(filter))
-            .forEach(school => {
-                const marker = L.marker([school.lat, school.lon]).addTo(map);
-                marker.bindPopup(getPopupContent(school, currentLanguage));
-                schoolMarkers.push(marker);
+        // Get selected program from the dropdown
+        const selectedProgram = programFilter.value;
+        console.log(`Selected Program: ${selectedProgram}`); // Debug
 
-                // Update popup content on language switch
-                languageSwitchListeners.push(() => {
-                    marker.setPopupContent(getPopupContent(school, currentLanguage));
-                });
+        // Iterate through the schools and add markers
+        schools.forEach(school => {
+            console.log(`Checking School: ${school.name}, Programs: ${school.programs}`); // Debug
+
+            // Check if the school matches the selected program
+            if (selectedProgram !== 'all' && !school.programs.map(p => p.trim().toLowerCase()).includes(selectedProgram.toLowerCase())) {
+                return; // Skip this school
+            }
+
+            // Create a marker for the school
+            const marker = L.marker([school.lat, school.lon]).addTo(map);
+
+            // Function to get popup content
+            function getPopupContent(language) {
+                return `
+                    <b>${school.name}</b><br>
+                    <img src="${school.image}" alt="${school.name}" style="width:100px;height:auto;"><br>
+                    <a href="${school.website}" target="_blank">Visit Website</a><br>
+                    ${language === 'haw' ? school.description_haw : school.description_en}<br>
+                    <b>Programs:</b> ${school.programs.join(', ')}
+                `;
+            }
+
+            // Bind popup content to the marker
+            marker.bindPopup(getPopupContent(currentLanguage));
+
+            // Add to language switch listeners
+            languageSwitchListeners.push(() => {
+                marker.setPopupContent(getPopupContent(currentLanguage));
             });
+        });
 
-        if (schoolMarkers.length === 0) {
-            console.warn('No markers to display. Check filter or data.');
+        console.log(`Markers added for program: ${selectedProgram}`);
+    }
+
+    // Attach event listener for dropdown
+    programFilter.addEventListener('change', () => {
+        console.log('Dropdown value changed!');
+        addSchoolMarkers(); // Reload markers when filter changes
+    });
+
+    // Attach event listener for reload button
+    const reloadButton = document.getElementById('reload-data');
+    if (reloadButton) {
+        reloadButton.addEventListener('click', async () => {
+            console.log('Reloading data and resetting filters...');
+            
+            // Reset the dropdown to its default value
+            programFilter.value = 'all';
+            
+            // Reload markers with fresh data
+            await addSchoolMarkers();
+        });
+    }
+
+    // Language switch function
+    function switchLanguage() {
+        currentLanguage = currentLanguage === 'en' ? 'haw' : 'en';
+
+        // Update all markers' popups
+        languageSwitchListeners.forEach(listener => listener());
+
+        // Update the flag image and button text
+        const languageFlag = document.getElementById('language-flag');
+        if (currentLanguage === 'en') {
+            languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Flag_of_Hawaii.svg';
+            languageFlag.alt = 'Hawaiian Flag';
+            languageFlag.nextSibling.textContent = ' Switch to ʻŌlelo Hawaiʻi';
+        } else {
+            languageFlag.src = 'https://upload.wikimedia.org/wikipedia/commons/a/a4/Flag_of_the_United_States.svg';
+            languageFlag.alt = 'American Flag';
+            languageFlag.nextSibling.textContent = ' Switch to English';
         }
     }
 
-    // Reload data
-    document.getElementById('reload-data').addEventListener('click', async () => {
-        console.log('Reloading data...');
-        await addSchoolMarkers(programFilter.value);
-    });
+    // Attach event listener for language button
+    const languageButton = document.querySelector('.language-button');
+    if (languageButton) {
+        languageButton.addEventListener('click', switchLanguage);
+    }
 
-    // Program filter
-    const programFilter = document.getElementById('program-filter');
-    programFilter.addEventListener('change', async () => {
-        const selectedProgram = programFilter.value;
-        console.log('Selected Program:', selectedProgram);
-        await addSchoolMarkers(selectedProgram);
-    });
-
-    // Initialize map
+    // Initialize the map and add markers
     addSchoolMarkers();
 });
