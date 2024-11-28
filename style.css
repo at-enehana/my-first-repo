@@ -68,7 +68,7 @@ body {
 }
 
 #reload-data {
-    top: 90px; /* Place under the program filter */
+    top: 110px; /* Place under the program filter */
 }
 
 /* Customize Leaflet Popups */
