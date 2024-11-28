@@ -13,8 +13,8 @@ body {
 /* Language Button Styles */
 .language-button {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
+    top: 10px; /* Position the button at the top */
+    right: 10px; /* Align it to the right */
     background: white;
     padding: 10px;
     cursor: pointer;
@@ -23,12 +23,29 @@ body {
     display: flex;
     align-items: center;
     font-size: 14px;
+    margin-bottom: 20px; /* Add spacing below the language button */
 }
 
 .language-button img {
     margin-right: 5px;
     width: 20px;
     height: 20px;
+}
+
+/* Program Filter Styles */
+#program-filter {
+    position: absolute;
+    right: 10px;
+    top: 50px;
+    z-index: 1000;
+    padding: 5px 10px;
+    background: white;
+    color: #007bff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 20px; /* Add spacing between the dropdown and the button above */
 }
 
 /* Control Button Styles */
@@ -38,7 +55,7 @@ body {
     z-index: 1000;
     padding: 5px 10px;
     background: white;
-    color:#007bff;
+    color: #007bff;
     border: 1px solid #ccc;
     border-radius: 5px;
     cursor: pointer;
@@ -51,9 +68,36 @@ body {
 }
 
 #reload-data {
-    top: 10px;
+    top: 90px; /* Place under the program filter */
 }
 
-#program-filter {
-    top: 50px;
+/* Customize Leaflet Popups */
+.leaflet-popup-content {
+    width: 90%; /* Set the width of the popup content */
+    font-size: 16px; /* Adjust the font size for better readability */
+    line-height: 1.6; /* Add better line spacing */
+    text-align: left; /* Align text to the left for readability */
+}
+
+.leaflet-popup-content img {
+    max-width: 100%; /* Ensure images don't overflow the popup */
+    height: auto;
+    display: block;
+    margin: 10px auto; /* Center the image with spacing */
+}
+
+.leaflet-popup-content-wrapper {
+    padding: 20px; /* Add padding inside the popup */
+}
+
+.leaflet-popup-content h1 {
+    font-size: 20px; /* Make the school name larger */
+    font-weight: bold;
+    text-align: center; /* Center the school name */
+    margin-bottom: 15px; /* Add spacing below the name */
+}
+
+.leaflet-popup-tip {
+    width: 20px; /* Adjust the size of the popup tip */
+    height: 10px;
 }
